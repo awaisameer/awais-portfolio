@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react";
+import { Download, Moon, Sun } from "lucide-react";
 import { motion } from "motion/react";
 import {
   useEffect,
@@ -208,6 +208,15 @@ export function Nav(): ReactNode {
           })}
         </ul>
         <NavThemeToggle />
+        <a
+          href="/Awais_Ameer_Resume.pdf"
+          download
+          aria-label="Download resume"
+          className="focus-ring ml-1 inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-foreground px-3 text-xs font-medium text-background transition-opacity hover:opacity-85"
+        >
+          <Download className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="hidden sm:inline">Resume</span>
+        </a>
       </div>
     </nav>
   );
