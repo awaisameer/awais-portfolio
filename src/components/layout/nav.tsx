@@ -11,6 +11,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 import { useTheme } from "@/lib/theme";
+import { portrait } from "@/lib/site";
 
 type NavItem = {
   label: string;
@@ -149,6 +150,19 @@ export function Nav(): ReactNode {
       className="fixed left-1/2 top-6 z-50 -translate-x-1/2"
     >
       <div className="flex items-center gap-1 rounded-full bg-background p-1.5 shadow-sm border border-foreground/8">
+        <Link
+          to="/"
+          className="mr-1 flex items-center gap-2 rounded-full pl-1.5 pr-3 py-1 transition-opacity hover:opacity-80"
+        >
+          <img
+            src={portrait.src}
+            alt={portrait.alt}
+            className="h-7 w-7 rounded-full object-cover"
+          />
+          <span className="text-sm font-semibold tracking-tight text-foreground">
+            Awais
+          </span>
+        </Link>
         <ul ref={listRef} className="relative flex items-center gap-1">
           {pillRect && (
             <motion.span

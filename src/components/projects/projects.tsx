@@ -14,13 +14,16 @@ import { AnimatePresence, motion } from "motion/react";
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ComponentType,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import { Link } from "react-router-dom";
 
 import { FadeIn } from "@/components/ui/motion-primitives";
+import { Reveal } from "@/components/ui/reveal";
 import { getLenisInstance } from "@/lib/lenis";
 
 type Shot = {
@@ -50,7 +53,7 @@ const PROJECTS: Project[] = [
     description:
       "An Angular single-page front end consuming an ASP.NET Core Web API, backed by a normalised SQL Server schema for products, orders and stock movements so nothing oversells.",
     meta: "Full Stack Developer, NAVTTC · 2024",
-    imageRatio: 1280 / 588,
+    imageRatio: 1128 / 746,
     liveUrl: "https://awaiswears.vercel.app/home",
     shots: [
       {
@@ -68,15 +71,11 @@ const PROJECTS: Project[] = [
     description:
       "OTP-based authentication with role-based doctor, patient and admin portals, built on ASP.NET Core MVC with invoices generated straight from treatment records.",
     meta: "Full Stack Developer, NAVTTC · 2024",
-    imageRatio: 1200 / 574,
+    imageRatio: 1024 / 768,
     shots: [
       {
         src: "/projects/hospital.webp",
         alt: "HMS dashboard showing patient, doctor and member totals",
-      },
-      {
-        src: "/projects/hospital-billings.webp",
-        alt: "HMS billings screen with searchable invoice table",
       },
     ],
   },
@@ -89,15 +88,11 @@ const PROJECTS: Project[] = [
     description:
       "A Power Apps upload flow with Dataverse deduplication and Power Automate dispatch through SendGrid, taking the full cycle from several hours to under five minutes.",
     meta: "Associate Software Engineer, Amigo Software · 2025",
-    imageRatio: 1200 / 507,
+    imageRatio: 1024 / 768,
     shots: [
       {
         src: "/projects/power-automation.webp",
         alt: "Email Notification dashboard with template preview and contact list",
-      },
-      {
-        src: "/projects/power-automation-app.webp",
-        alt: "Email Notification Power App welcome screen",
       },
     ],
   },
@@ -231,16 +226,38 @@ function ProjectCard({
 }): ReactNode {
   const Icon = project.icon;
   const cover = project.shots[0];
+  const cardRef = useRef<HTMLElement | null>(null);
+
+  // Pointer-tracked 3D tilt. Inline transform overrides the CSS hover lift,
+  // and clearing it on leave hands control back to the stylesheet.
+  const applyTilt = (event: ReactPointerEvent<HTMLElement>): void => {
+    const el = cardRef.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = el.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    const MAX_DEG = 5;
+    el.style.transform = `perspective(1100px) rotateY(${(px * MAX_DEG).toFixed(2)}deg) rotateX(${(-py * MAX_DEG).toFixed(2)}deg) translateY(-4px)`;
+  };
+
+  const resetTilt = (): void => {
+    const el = cardRef.current;
+    if (el) el.style.transform = "";
+  };
 
   return (
-    <FadeIn
+    <Reveal
       delay={Math.min(index * 0.06, 0.3)}
       className="mb-6 break-inside-avoid md:mb-7"
     >
       <article
+        ref={cardRef}
         role="button"
         tabIndex={0}
         onClick={onOpen}
+        onPointerMove={applyTilt}
+        onPointerLeave={resetTilt}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -309,7 +326,7 @@ function ProjectCard({
           {project.meta}
         </p>
       </article>
-    </FadeIn>
+    </Reveal>
   );
 }
 
